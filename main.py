@@ -40,3 +40,7 @@ def generate_pdf():
     output.seek(0)
 
     return send_file(output, as_attachment=True, download_name=f"watermarked_{filename}", mimetype='application/pdf')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
+
