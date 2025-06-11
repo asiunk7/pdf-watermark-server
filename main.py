@@ -7,6 +7,10 @@ import os
 
 app = Flask(__name__)
 
+@app.route('/')  # 🟢 ROUTE ANTI-SLEEP
+def keep_alive():
+    return 'Server aktif bro 👊', 200
+
 @app.route('/generate')
 def generate_pdf():
     name = request.args.get('name', 'Unknown User')
