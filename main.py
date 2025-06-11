@@ -1,17 +1,26 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, abort
 from PyPDF2 import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import io
+import os
 
 app = Flask(__name__)
 
 @app.route('/generate')
 def generate_pdf():
     name = request.args.get('name', 'Unknown User')
+    filename = request.args.get('filename', None)
 
-    # Load base PDF
-    reader = PdfReader("template.pdf")
+    if not filename:
+        return "Missing filename", 400
+
+    file_path = os.path.join("pdfs", filename)
+
+    if not os.path.isfile(file_path):
+        return "File not found", 404
+
+    reader = PdfReader(file_path)
     writer = PdfWriter()
 
     for page in reader.pages:
@@ -22,7 +31,6 @@ def generate_pdf():
         can.save()
         packet.seek(0)
 
-        # Merge watermark
         watermark = PdfReader(packet)
         page.merge_page(watermark.pages[0])
         writer.add_page(page)
@@ -31,4 +39,4 @@ def generate_pdf():
     writer.write(output)
     output.seek(0)
 
-    return send_file(output, as_attachment=True, download_name="watermarked.pdf", mimetype='application/pdf')
+    return send_file(output, as_attachment=True, download_name=f"watermarked_{filename}", mimetype='application/pdf')
