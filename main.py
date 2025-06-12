@@ -11,6 +11,10 @@ app = Flask(__name__)
 def keep_alive():
     return 'Server aktif bro 👊', 200
 
+@app.route('/ping')  # 🟢 Route ringan buat UptimeRobot
+def ping():
+    return 'pong', 200
+
 @app.route('/generate')
 def generate_pdf():
     name = request.args.get('name', 'Unknown User')
