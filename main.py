@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, abort
+from flask import Flask, request, send_file, make_response
 from PyPDF2 import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -56,7 +56,16 @@ def generate_pdf():
     writer.write(output)
     output.seek(0)
 
-    return send_file(output, as_attachment=True, download_name=f"watermarked_{filename}", mimetype='application/pdf')
+    # ✅ Tambahan: header agar langsung download, tanpa preview
+    response = make_response(send_file(
+        output,
+        as_attachment=True,
+        download_name=f"watermarked_{filename}",
+        mimetype='application/pdf'
+    ))
+    response.headers["Content-Disposition"] = f"attachment; filename=watermarked_{filename}"
+    response.headers["Content-Type"] = "application/octet-stream"
+    return response
 
 if __name__ == '__main__':
     port = int(os.environ['PORT'])
