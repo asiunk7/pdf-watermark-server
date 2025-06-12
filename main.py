@@ -60,7 +60,7 @@ def generate_pdf():
     response = make_response(send_file(
         output,
         as_attachment=True,
-        download_name=f"watermarked_{filename}",
+        download_name=f"APIC_{filename}",
         mimetype='application/pdf'
     ))
     response.headers["Content-Disposition"] = f"attachment; filename=watermarked_{filename}"
