@@ -1,3 +1,4 @@
 flask
 PyPDF2
 reportlab
+gunicorn
