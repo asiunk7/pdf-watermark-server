@@ -56,7 +56,7 @@ def generate_pdf():
     writer.write(output)
     output.seek(0)
 
-    return send_file(output, as_attachment=True, download_name=f"watermarked_{filename}", mimetype='application/pdf')
+    return send_file(output, as_attachment=True, download_name=f"APIC_{filename}", mimetype='application/pdf')
 
 if __name__ == '__main__':
     port = int(os.environ['PORT'])
