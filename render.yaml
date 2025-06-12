@@ -3,4 +3,4 @@ services:
     name: pdf-watermark-server
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python main.py
+    startCommand: gunicorn main:app
