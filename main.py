@@ -30,8 +30,16 @@ def generate_pdf():
     for page in reader.pages:
         packet = io.BytesIO()
         can = canvas.Canvas(packet, pagesize=letter)
-        can.setFont("Helvetica", 10)
-        can.drawString(50, 30, f"Downloaded by {name}")
+
+        # ✅ Tambahkan watermark di tengah halaman
+        can.saveState()
+        can.translate(300, 400)  # posisi tengah halaman (x=300, y=400)
+        can.rotate(45)           # kemiringan watermark
+        can.setFont("Helvetica-Bold", 40)
+        can.setFillGray(0.5, 0.1)  # warna abu-abu terang dengan transparansi
+        can.drawCentredString(0, 0, f"Downloaded by {name}")
+        can.restoreState()
+
         can.save()
         packet.seek(0)
 
@@ -48,4 +56,3 @@ def generate_pdf():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
-
