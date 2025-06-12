@@ -37,7 +37,8 @@ def generate_pdf():
         can.rotate(45)           # kemiringan watermark
         can.setFont("Helvetica-Bold", 40)
         can.setFillGray(0.5, 0.1)  # warna abu-abu terang dengan transparansi
-        can.drawCentredString(0, 0, f"Downloaded by {name}")
+        can.drawCentredString(0, 20, "Downloaded by")
+        can.drawCentredString(0, -20, name)
         can.restoreState()
 
         can.save()
