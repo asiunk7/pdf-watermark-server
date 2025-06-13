@@ -1,9 +1,10 @@
-from flask import Flask, request, send_file, abort
+from flask import Flask, request, send_file
 from PyPDF2 import PdfReader, PdfWriter
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 import io
 import os
+import uuid
 
 app = Flask(__name__)
 
@@ -37,14 +38,13 @@ def generate_pdf():
 
         # ✅ Tambahkan watermark di tengah halaman
         can.saveState()
-        can.translate(300, 400)  # posisi tengah halaman (x=300, y=400)
-        can.rotate(45)           # kemiringan watermark
+        can.translate(300, 400)
+        can.rotate(45)
         can.setFont("Helvetica-Bold", 40)
-        can.setFillGray(0.5, 0.1)  # warna abu-abu terang dengan transparansi
+        can.setFillGray(0.5, 0.1)
         can.drawCentredString(0, 20, "Downloaded by")
         can.drawCentredString(0, -20, name)
         can.restoreState()
-
         can.save()
         packet.seek(0)
 
@@ -52,12 +52,28 @@ def generate_pdf():
         page.merge_page(watermark.pages[0])
         writer.add_page(page)
 
-    output = io.BytesIO()
-    writer.write(output)
-    output.seek(0)
+    # ✅ Simpan ke file sementara
+    temp_filename = f"temp_{uuid.uuid4().hex}.pdf"
+    temp_filepath = os.path.join("pdfs", temp_filename)
 
-    return send_file(output, as_attachment=True, download_name=f"APIC_{filename}", mimetype='application/pdf')
+    with open(temp_filepath, "wb") as f:
+        writer.write(f)
+
+    # ✅ Kirim file sebagai download
+    response = send_file(temp_filepath, as_attachment=True,
+                         download_name=f"APIC_{filename}",
+                         mimetype='application/pdf')
+
+    # ✅ Hapus file setelah response selesai dikirim
+    @response.call_on_close
+    def cleanup():
+        try:
+            os.remove(temp_filepath)
+        except:
+            pass
+
+    return response
 
 if __name__ == '__main__':
-    port = int(os.environ['PORT'])
+    port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port)
